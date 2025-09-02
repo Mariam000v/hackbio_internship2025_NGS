@@ -1,0 +1,90 @@
+#Part 1 script
+#!/bin/bash
+
+#print your name
+echo 'Mariam Mohamed'
+#create folder with your name
+mkdir mariam
+#make another directory titled 'biocomputing' and change to that directory with one line.
+mkdir biocomputing && cd biocomputing
+#download 3 files
+wget https://raw.githubusercontent.com/josoga2/dataset-repos/main/wildtype.fna
+wget https://raw.githubusercontent.com/josoga2/dataset-repos/main/wildtype.gbk
+wget https://raw.githubusercontent.com/josoga2/dataset-repos/main/wildtype.gbk
+#move the fna files to the directory with your name
+mv *.fna ../mariam
+#remove the duplicate gbk file
+rm *.gbk.*
+#confirm if fna is mutant or wild
+cd ../
+
+if grep -q "tatata" mariam/wildtype.fna; then
+  echo "Mutant file"
+  echo "Mutant file" >> results.txt
+elif grep -q "tata" mariam/wildtype.fna; then
+  echo "Wild type file"
+  echo "Wild type file" >> results.txt
+fi
+
+#count lines without header
+lines_with_header=$(wc -l biocomputing/wildtype.gbk | awk '{print $1}')
+lines=$((lines_with_header -1))
+echo "there are $lines in the gbk file"
+
+#print the length of the sequence using 'LOCUS' 
+grep 'LOCUS' biocomputing/wildtype.gbk | awk '{print $3}'
+# Print the source organism of the .gbk file. (Use the SOURCE tag in the first line)
+grep 'SOURCE' biocomputing/wildtype.gbk | awk '{print $2, $3}'
+
+# List all the gene names of the .gbk file. Hint {grep '/gene='}
+
+grep '/gene' wildtype.gbk 
+# Clear your terminal space and print all commands used today
+clear
+#List the files in the two folders
+ls mariam/ biocomputing/
+
+
+
+
+
+#part 2 installation script
+#!/bin/bash
+
+# Step 1: Download Miniconda installer
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+
+# Step 2: Install Miniconda silently into ~/miniconda
+bash miniconda.sh -b -p $HOME/miniconda
+
+# Step 3: Initialize conda in this script
+source $HOME/miniconda/etc/profile.d/conda.sh
+
+# Step 4: Check conda version
+conda --version
+
+# Step 5: Create a conda environment named 'funtools'
+conda create -n funtools -y
+
+# Step 6: Activate funtools environment
+conda activate funtools
+
+# Step 7: Install figlet from conda-forge
+conda install -c conda-forge figlet -y
+
+# Step 8: Run figlet with your name
+figlet "Mariam"
+
+# Step 9: Add bioconda channels
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+
+# Step 10: Install bioinformatics tools
+conda install -c bioconda bwa blast samtools bedtools spades bcftools fastp multiqc -y
+
+-------------------
+
+
+#Link to LinkedIn Video:
+https://www.linkedin.com/feed/update/urn:li:activity:7367566727838171136/
