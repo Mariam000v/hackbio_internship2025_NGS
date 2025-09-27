@@ -1,1 +1,41 @@
 
+
+# Stage 1 WGS – Workflow
+
+This document summarizes the main steps of the **Whole Genome Sequencing (WGS) Stage 1 project.  
+
+---
+
+## 1. Project setup
+```bash
+pwd
+mkdir project1
+mkdir qc_report
+
+2. Quality control & Trimming
+# Run FastQC
+fastqc
+fastqc
+
+# Run QC + trimming + MultiQC
+bash fastp_multiqc_qc.sh
+
+3. Genome Mapping
+# Align trimmed reads to reference genome
+bash bwa_samtools_align.sh
+
+4. Debugging scripts
+# Repair read pairs and re-align
+bash repair_father_reads.sh
+bash fix_father_align.sh
+
+# Check alignment outputs
+ls -lh alignment_map/
+
+5. Variant Calling
+
+# Add read groups, mark duplicates, and generate BAM indices
+bash scripts/varient_calling_debugged2.sh
+
+# Run variant calling (HaplotypeCaller, CombineGVCFs, GenotypeGVCFs)
+# Output VCFs will be in VCF/ folder
