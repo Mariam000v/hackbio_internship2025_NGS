@@ -1,1 +1,84 @@
+Clinical Case Study: Whole-Genome Sequencing (WGS)
+Clinical Background
 
+A 6-year-old boy presents with chronic cough, recurrent lung infections, and poor weight gain despite adequate nutrition. His physician suspects cystic fibrosis (CF). A sweat chloride test has been ordered but yields borderline results (45 mmol/L).
+
+To confirm diagnosis and identify the causative genetic variant(s), the clinical team orders whole-genome sequencing (WGS).
+
+The boy’s father has also been sequenced as part of the family study. The mother’s genomic data are not available.
+
+Task Overview
+
+Objects:
+
+1. Perform quality control and alignment of raw WGS reads to the human reference genome.
+
+2. Call variants in both father and child.
+
+3. Focus analysis on the CFTR locus (chromosome 7q31.2).
+
+4. Compare the child’s variants against the father’s to determine inheritance patterns.
+
+5. Annotate and interpret variants to identify known pathogenic CFTR mutations (ΔF508, G542X, W1282X, etc.) using databases such as ClinVar.
+
+6. Conclude whether the child is affected by CF based on genotype, and note whether observed mutations are inherited or potentially de novo.
+
+Methods
+# Stage 1 WGS – Workflow
+
+# 1. Project setup
+pwd
+mkdir project1
+mkdir qc_report
+
+# 2. Quality control & trimming
+# Run FastQC
+fastqc
+fastqc
+
+# Run QC + trimming + MultiQC
+bash scripts/fastp_multiqc_qc.sh
+
+# 3. Genome Mapping
+# Align trimmed reads to reference genome
+bash scripts/bwa_samtools_align.sh
+
+# 4. Debugging scripts
+# Repair read pairs and re-align
+bash scripts/repair_father_reads.sh
+bash scripts/fix_father_align.sh
+
+# Check alignment outputs
+ls -lh alignment_map/
+
+# 5. Variant Calling
+# Add read groups, mark duplicates, and generate BAM indices
+bash scripts/varient_calling_debugged2.sh
+
+# Run variant calling (HaplotypeCaller, CombineGVCFs, GenotypeGVCFs)
+# Output VCFs will be in VCF/ folder
+
+Results
+
+CFTR locus variant analysis (child vs father):
+To be added later.
+
+VCF excerpts / IGV screenshots / annotation summaries:
+To be added later.
+
+Inheritance patterns:
+To be added later.
+
+Clinical Interpretation
+
+Based on the analysis of the CFTR gene and variant annotations:
+
+1. Likely pathogenic variants: To be added later.
+
+2. Genotype interpretation (affected, carrier, or unaffected): To be added later.
+
+3. Inheritance pattern (inherited or de novo): To be added later.
+
+Conclusion
+
+To be added later.
