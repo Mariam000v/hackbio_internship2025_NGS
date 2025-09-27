@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# Set project base dir
+proj_dir=~/Mariam/project1
+
+# -------------------------
+# Add Read Groups to child and father (if not already done)
+# -------------------------
+if [ ! -f $proj_dir/alignment_map/child_dedup_rg.bam ]; then
+    gatk AddOrReplaceReadGroups \
+        -I $proj_dir/alignment_map/child_dedup.bam \
+        -O $proj_dir/alignment_map/child_dedup_rg.bam \
+        -ID child -LB lib1 -PL ILLUMINA -PU unit1 -SM child
+fi
+
+if [ ! -f $proj_dir/alignment_map/father_dedup_rg.bam ]; then
+    gatk AddOrReplaceReadGroups \
+        -I $proj_dir/alignment_map/father_dedup.bam \
+        -O $proj_dir/alignment_map/father_dedup_rg.bam \
+        -ID father -LB lib1 -PL ILLUMINA -PU unit1 -SM father
+fi
+
+# -------------------------
+# Build BAM Index
+# -------------------------
+gatk BuildBamIndex \
+  -I $proj_dir/alignment_map/child_dedup_rg.bam
+
+gatk BuildBamIndex \
+  -I $proj_dir/alignment_map/father_dedup_rg.bam
+
+# -------------------------
+# Base Quality Score Recalibration (BQSR)
+# -------------------------
+mkdir -p $proj_dir/BQSR
+
+# for child
+gatk BaseRecalibrator \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/alignment_map/child_dedup_rg.bam \
+  --known-sites /data/Homo_sapiens_assembly38.known_indels.vcf.gz \
+  -O $proj_dir/BQSR/child_recal_data.table
+
+gatk ApplyBQSR \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/alignment_map/child_dedup_rg.bam \
+  --bqsr-recal-file $proj_dir/BQSR/child_recal_data.table \
+  -O $proj_dir/BQSR/child_recal.bam
+
+# for father
+gatk BaseRecalibrator \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/alignment_map/father_dedup_rg.bam \
+  --known-sites /data/Homo_sapiens_assembly38.known_indels.vcf.gz \
+  -O $proj_dir/BQSR/father_recal_data.table
+
+gatk ApplyBQSR \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/alignment_map/father_dedup_rg.bam \
+  --bqsr-recal-file $proj_dir/BQSR/father_recal_data.table \
+  -O $proj_dir/BQSR/father_recal.bam
+
+# -------------------------
+# HaplotypeCaller
+# -------------------------
+mkdir -p $proj_dir/VCF
+
+# for child
+gatk HaplotypeCaller \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/BQSR/child_recal.bam \
+  -O $proj_dir/VCF/child.g.vcf.gz \
+  -ERC GVCF
+
+# for father
+gatk HaplotypeCaller \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I $proj_dir/BQSR/father_recal.bam \
+  -O $proj_dir/VCF/father.g.vcf.gz \
+  -ERC GVCF
+
+# -------------------------
+# Combine GVCFs
+# -------------------------
+gatk CombineGVCFs \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  --variant $proj_dir/VCF/child.g.vcf.gz \
+  --variant $proj_dir/VCF/father.g.vcf.gz \
+  -O $proj_dir/VCF/family_combined.g.vcf.gz
+
+# -------------------------
+# Joint Genotyping
+# -------------------------
+gatk GenotypeGVCFs \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -V $proj_dir/VCF/family_combined.g.vcf.gz \
+  -O $proj_dir/VCF/family_variants.vcf.gz
+
