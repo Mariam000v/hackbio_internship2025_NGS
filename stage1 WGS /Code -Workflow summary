@@ -131,32 +131,23 @@ samtools view -H ~/Mariam/project1/BQSR/father_recal.bam | head
 # Run variant calling (HaplotypeCaller, CombineGVCFs, GenotypeGVCFs)
 # Output VCFs will be in VCF/ folder
 
-mkdir -p ~/Mariam/project1/VCF
+mkdir -p ~/Mariam/project1/vcf
 
-# 1) HaplotypeCaller — child
+# HaplotypeCaller - CFTR-focused, chr7:117480025-117668665
+#child 
 gatk HaplotypeCaller \
   -R /data/Homo_sapiens_assembly38.fasta \
   -I ~/Mariam/project1/BQSR/child_recal.bam \
-  -O ~/Mariam/project1/VCF/child.g.vcf.gz \
-  -ERC GVCF
-
-# 2) HaplotypeCaller — father
+  -O ~/Mariam/project1/vcf/child_cftr.g.vcf.gz \
+  -ERC GVCF \
+  -L chr7:117480025-117668665
+# father
 gatk HaplotypeCaller \
   -R /data/Homo_sapiens_assembly38.fasta \
   -I ~/Mariam/project1/BQSR/father_recal.bam \
-  -O ~/Mariam/project1/VCF/father.g.vcf.gz \
-  -ERC GVCF
+  -O ~/Mariam/project1/vcf/father_cftr.g.vcf.gz \
+  -ERC GVCF \
+  -L chr7:117480025-117668665
 
-# 3) Combine GVCFs
-gatk CombineGVCFs \
-  -R /data/Homo_sapiens_assembly38.fasta \
-  --variant ~/Mariam/project1/VCF/child.g.vcf.gz \
-  --variant ~/Mariam/project1/VCF/father.g.vcf.gz \
-  -O ~/Mariam/project1/VCF/family_combined.g.vcf.gz
 
-# 4) Genotype joint GVCF
-gatk GenotypeGVCFs \
-  -R /data/Homo_sapiens_assembly38.fasta \
-  -V ~/Mariam/project1/VCF/family_combined.g.vcf.gz \
-  -O ~/Mariam/project1/VCF/family_variants.vcf.gz
 
