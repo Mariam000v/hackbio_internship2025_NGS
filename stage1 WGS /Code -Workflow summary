@@ -31,11 +31,104 @@ bash fix_father_align.sh
 
 # Check alignment outputs
 ls -lh alignment_map/
+#Quick check before proceeding 
+samtools quickcheck alignment_map/child_sorted.bam && echo "OK" || echo "PROBLEM"
 
 5. Variant Calling
+#Add Read Groups to your sorted BAMs (child and father):
+# Child
+gatk AddOrReplaceReadGroups \
+    -I alignment_map/child_sorted.bam \
+    -O alignment_map/child_rg.bam \
+    -RGID child \
+    -RGLB lib1 \
+    -RGPL ILLUMINA \
+    -RGPU unit1 \
+    -RGSM child
+# Father
+gatk AddOrReplaceReadGroups \
+    -I alignment_map/father_sorted.bam \
+    -O alignment_map/father_rg.bam \
+    -RGID father \
+    -RGLB lib1 \
+    -RGPL ILLUMINA \
+    -RGPU unit1 \
+    -RGSM father
+# quick check
+samtools view -H alignment_map/child_rg.bam | grep '@RG'
+samtools view -H alignment_map/father_rg.bam | grep '@RG'
+# check sorted coordinates. SO:coordinate → good, SO:unsorted → need to sort.
+samtools view -H alignment_map/child_rg.bam | grep SO
+ samtools view -H alignment_map/father_rg.bam | grep SO
 
-# Add read groups, mark duplicates, and generate BAM indices
-bash scripts/varient_calling_debugged2.sh
+# Mark Duplicates
+# child
+gatk MarkDuplicates \
+    -I alignment_map/child_rg.bam \
+    -O alignment_map/child_dedup.bam \
+    -M alignment_map/child_metrics.txt
+
+# father
+gatk MarkDuplicates \
+  -I alignment_map/father_rg.bam \
+  -O alignment_map/father_dedup.bam \
+  -M alignment_map/father_metrics.txt
+
+
+# Check the BAM header for @PG and @RG
+samtools view -H alignment_map/child_dedup.bam | head
+samtools view -H alignment_map/father_dedup.bam | head
+
+# Check duplicate metrics
+cat alignment_map/child_metrics.txt
+cat alignment_map/father_metrics.txt
+
+# BAM indexing
+samtools index alignment_map/child_dedup.bam
+samtools index alignment_map/father_dedup.bam
+ls alignment_map/
+
+# Base Quality Score Recalibration (BQSR)
+mkdir -p ~/Mariam/project1/BQSR
+
+# child
+gatk BaseRecalibrator \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I ~/Mariam/project1/alignment_map/child_dedup.bam \
+  --known-sites /data/Homo_sapiens_assembly38.dbsnp138.vcf.gz \
+  --known-sites /data/Homo_sapiens_assembly38.known_indels.vcf.gz \
+  -O ~/Mariam/project1/BQSR/child_recal_data.table
+
+gatk ApplyBQSR \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I ~/Mariam/project1/alignment_map/child_dedup.bam \
+  --bqsr-recal-file ~/Mariam/project1/BQSR/child_recal_data.table \
+  -O ~/Mariam/project1/BQSR/child_recal.bam
+
+
+
+# father
+gatk BaseRecalibrator \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I ~/Mariam/project1/alignment_map/father_dedup.bam \
+  --known-sites /data/Homo_sapiens_assembly38.dbsnp138.vcf.gz \
+  --known-sites /data/Homo_sapiens_assembly38.known_indels.vcf.gz \
+  -O ~/Mariam/project1/BQSR/father_recal_data.table
+
+gatk ApplyBQSR \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -I ~/Mariam/project1/alignment_map/father_dedup.bam \
+  --bqsr-recal-file ~/Mariam/project1/BQSR/father_recal_data.table \
+  -O ~/Mariam/project1/BQSR/father_recal.bam
+
+#
+Confirm
+ls -lh ~/Mariam/project1/BQSR/
+samtools view -H ~/Mariam/project1/BQSR/child_recal.bam | head
+samtools view -H ~/Mariam/project1/BQSR/father_recal.bam | head
+
+
+
 
 # Run variant calling (HaplotypeCaller, CombineGVCFs, GenotypeGVCFs)
 # Output VCFs will be in VCF/ folder
