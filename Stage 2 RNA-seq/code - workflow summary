@@ -56,10 +56,30 @@ mv raw_data/fastp_report trim/
 multiqc trim/fastp_reports/ -o multiqc_trim/
 
 6. Mapping
-# Mapping with STAR (to be added)
+# Mapping with STAR 
+#get the reference genome
+mkdir -p ref
+cp ../project1/Homo_sapiens_assembly38.fasta* ref/
+ls
+#Build STAR genome index
+mkdir -p ref/star_index
+
+STAR \
+  --runThreadN 8 \
+  --runMode genomeGenerate \
+  --genomeDir ref/star_index \
+  --genomeFastaFiles ref/Homo_sapiens_assembly38.fasta
+
+#Align trimmed reads
+Bash align…….sh
+ls -lh alignment_Star
+ls -lh alignment_Logs
+# Check the bam files quickly
+samtools quickcheck alignment_star/*.bam && echo "All good!"
+
 
 7. Differential Expression Analysis
-# Differential expression analysis (DESeq2, edgeR, or other)
+# Differential expression analysis (DESeq2)
 # To be added later
 
 8. Gene Ontology / Pathway Enrichment
