@@ -162,6 +162,8 @@ gatk GenotypeGVCFs \
   -V ~/Mariam/project1/vcf/family_cftr.combined.g.vcf.gz \
   -O ~/Mariam/project1/vcf/family_cftr.vcf.gz
 
+#Check if variants were called
+bcftools view ~/Mariam/project1/vcf/family_cftr.vcf.gz | grep -v "^#" | wc -l
 
 
 
