@@ -149,5 +149,19 @@ gatk HaplotypeCaller \
   -ERC GVCF \
   -L chr7:117480025-117668665
 
+#combined
+gatk CombineGVCFs \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -V ~/Mariam/project1/vcf/child_cftr.g.vcf.gz \
+  -V ~/Mariam/project1/vcf/father_cftr.g.vcf.gz \
+  -O ~/Mariam/project1/vcf/family_cftr.combined.g.vcf.gz
+
+#Joint Genotyping
+gatk GenotypeGVCFs \
+  -R /data/Homo_sapiens_assembly38.fasta \
+  -V ~/Mariam/project1/vcf/family_cftr.combined.g.vcf.gz \
+  -O ~/Mariam/project1/vcf/family_cftr.vcf.gz
+
+
 
 
