@@ -1,13 +1,13 @@
 
-RNA-seq Project – Workflow
+#RNA-seq Project – Workflow
 
-This document summarizes the main steps of the RNA-seq project (Project 2).
+#This document summarizes the main steps of the RNA-seq project (Project 2).
 
-1. Project setup
+#1. Project setup
 # Create project directory
 mkdir project2
 
-2. Data download
+#2. Data download
 # Download data using SRA Explorer via bash script
 nano download_data.sh
 
@@ -15,7 +15,7 @@ nano download_data.sh
 mkdir raw_data
 mv *fastq.gz raw_data/
 
-3. Quality Control
+#3. Quality Control
 # Create folder for QC results
 mkdir qc_result
 
@@ -29,7 +29,7 @@ ls -lh qc_result
 ls qc_result/*fastqc.html | wc -l
 ls qc_result/*fastqc.zip | wc -l
 
-4. MultiQC Summary
+#4. MultiQC Summary
 # Generate MultiQC report for QC results
 mkdir multiqc
 multiqc qc_result/ -o multiqc/
@@ -37,7 +37,7 @@ multiqc qc_result/ -o multiqc/
 # List MultiQC output
 ls multiqc/
 
-5. Trimming
+#5. Trimming
 # Create folder for trimmed reads
 mkdir trim
 
@@ -55,7 +55,7 @@ mv raw_data/fastp_report trim/
 # Run MultiQC on trimming reports
 multiqc trim/fastp_reports/ -o multiqc_trim/
 
-6. Mapping
+#6. Mapping
 # Mapping with STAR 
 #get the reference genome
 mkdir -p ref
@@ -90,7 +90,7 @@ featureCounts -T 8 \
     alignment_star/*.bam
 
 
-7. Differential Expression Analysis
+#7. Differential Expression Analysis
 # Differential expression analysis (DESeq2)
 # To be added later
 
