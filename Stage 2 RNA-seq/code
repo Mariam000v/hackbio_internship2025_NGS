@@ -89,6 +89,13 @@ featureCounts -T 8 -p \
     -o counts/gene_counts.txt \
     alignment_star/*.bam
 
+#check
+ls counts/
+ls alignment_star
+cat counts/gene_counts.txt.summary
+less counts/gene_counts.txt
+
+
 #7. Differential Expression Analysis
 # Differential expression analysis (DESeq2)
 # To be added later
