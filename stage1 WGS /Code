@@ -1,8 +1,8 @@
-
+#!/bin/bash
 
 # Stage 1 WGS – Workflow
 
-This document summarizes the main steps of the **Whole Genome Sequencing (WGS) Stage 1 project.  
+#This document summarizes the main steps of the **Whole Genome Sequencing (WGS) Stage 1 project.  
 
 ---
 
@@ -12,7 +12,7 @@ pwd
 mkdir project1
 mkdir qc_report
 
-2. Quality control & Trimming
+#2. Quality control & Trimming
 # Run FastQC
 fastqc
 fastqc
@@ -20,11 +20,11 @@ fastqc
 # Run QC + trimming + MultiQC
 bash fastp_multiqc_qc.sh
 
-3. Genome Mapping
+#3. Genome Mapping
 # Align trimmed reads to reference genome
 bash bwa_samtools_align.sh
 
-4. Debugging scripts
+#4. Debugging scripts
 # Repair read pairs and re-align
 bash repair_father_reads.sh
 bash fix_father_align.sh
@@ -34,7 +34,7 @@ ls -lh alignment_map/
 #Quick check before proceeding 
 samtools quickcheck alignment_map/child_sorted.bam && echo "OK" || echo "PROBLEM"
 
-5. Variant Calling
+#5. Variant Calling
 #Add Read Groups to your sorted BAMs (child and father):
 # Child
 gatk AddOrReplaceReadGroups \
