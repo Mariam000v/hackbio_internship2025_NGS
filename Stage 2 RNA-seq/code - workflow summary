@@ -77,6 +77,18 @@ ls -lh alignment_Logs
 # Check the bam files quickly
 samtools quickcheck alignment_star/*.bam && echo "All good!"
 
+#Counting the abundance of the transcriptome
+mkdir -p counts
+# Download the annotation file
+wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_38/gencode.v38.annotation.gtf.gz -P counts/
+# Uncompress the file
+gunzip counts/gencode.v38.annotation.gtf.gz
+# Run featureCounts
+featureCounts -T 8 \
+    -a counts/gencode.v38.annotation.gtf \
+    -o counts/gene_counts.txt \
+    alignment_star/*.bam
+
 
 7. Differential Expression Analysis
 # Differential expression analysis (DESeq2)
