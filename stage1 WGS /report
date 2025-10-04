@@ -1,84 +1,129 @@
 Clinical Case Study: Whole-Genome Sequencing (WGS)
 Clinical Background
 
-A 6-year-old boy presents with chronic cough, recurrent lung infections, and poor weight gain despite adequate nutrition. His physician suspects cystic fibrosis (CF). A sweat chloride test has been ordered but yields borderline results (45 mmol/L).
+A 6-year-old boy presents with chronic cough, recurrent lung infections, and poor weight gain. Borderline sweat chloride test (45 mmol/L) raises suspicion of cystic fibrosis (CF).
 
-To confirm diagnosis and identify the causative genetic variant(s), the clinical team orders whole-genome sequencing (WGS).
+Whole-genome sequencing (WGS) was performed on the child and his father to investigate CFTR variants. Maternal genomic data are unavailable.
 
-The boy’s father has also been sequenced as part of the family study. The mother’s genomic data are not available.
+#WGS Workflow
 
-Task Overview
+1.Project setup
 
-Objects:
+mkdir project1 qc_report
 
-1. Perform quality control and alignment of raw WGS reads to the human reference genome.
 
-2. Call variants in both father and child.
+2.Quality control and trimming
 
-3. Focus analysis on the CFTR locus (chromosome 7q31.2).
-
-4. Compare the child’s variants against the father’s to determine inheritance patterns.
-
-5. Annotate and interpret variants to identify known pathogenic CFTR mutations (ΔF508, G542X, W1282X, etc.) using databases such as ClinVar.
-
-6. Conclude whether the child is affected by CF based on genotype, and note whether observed mutations are inherited or potentially de novo.
-
-Methods
-# Stage 1 WGS – Workflow
-
-# 1. Project setup
-pwd
-mkdir project1
-mkdir qc_report
-
-# 2. Quality control & trimming
-# Run FastQC
-fastqc
-fastqc
-
-# Run QC + trimming + MultiQC
+fastqc raw_reads/*
 bash scripts/fastp_multiqc_qc.sh
 
-# 3. Genome Mapping
-# Align trimmed reads to reference genome
+
+3.Genome alignment
+
 bash scripts/bwa_samtools_align.sh
 
-# 4. Debugging scripts
-# Repair read pairs and re-align
-bash scripts/repair_father_reads.sh
-bash scripts/fix_father_align.sh
 
-# Check alignment outputs
-ls -lh alignment_map/
+4.Variant calling
 
-# 5. Variant Calling
-# Add read groups, mark duplicates, and generate BAM indices
-bash scripts/varient_calling_debugged2.sh
+- Add Read Groups
 
-# Run variant calling (HaplotypeCaller, CombineGVCFs, GenotypeGVCFs)
-# Output VCFs will be in VCF/ folder
+Added read group information to sorted BAM files for child and father using GATK AddOrReplaceReadGroups.
+
+Verified headers (@RG) and coordinate sorting.
+
+- Mark Duplicates
+
+Removed PCR duplicates with GATK MarkDuplicates.
+
+Checked duplicate metrics and BAM headers for quality.
+
+- Index BAM Files
+
+Indexed deduplicated BAMs using samtools index for downstream analysis.
+
+- Base Quality Score Recalibration (BQSR)
+
+Performed BQSR on child and father BAMs using known SNP and indel sites.
+
+Applied recalibration to produce final recalibrated BAMs.
+
+- Variant Calling (CFTR-focused)
+
+Used GATK HaplotypeCaller in GVCF mode, restricted to CFTR locus (chr7:117480025-117668665).
+
+Generated GVCFs for child and father.
+
+Combine GVCFs and Joint Genotyping
+
+Merged child and father GVCFs using GATK CombineGVCFs.
+
+Performed joint genotyping with GATK GenotypeGVCFs to produce final family VCF.
+
+- Quality Check
+
+Confirmed variant calling by counting VCF entries using bcftools.
+
+5.VEP annotation
+
+#VCF variants annotated using Ensembl VEP online.
+
+#Downloaded vep2.txt for downstream analysis in R.
+
+#R-based CFTR Variant Analysis
+library(dplyr)
+library(stringr)
+
+vep_file <- "C:/.../vep2.txt"
+vep_df <- read.delim(vep_file, header=TRUE, stringsAsFactors=FALSE)
+
+# Filter CFTR variants
+cftr_variants <- vep_df %>% filter(SYMBOL == "CFTR")
+
+# Highlight common CF mutations
+cf_mutations <- c("F508del","G542X","W1282X","N1303K","R117H","G551D")
+cftr_variants <- cftr_variants %>%
+  mutate(CF_related = ifelse(str_detect(HGVSp, paste(cf_mutations, collapse="|")), TRUE, FALSE))
+
+# Pathogenic/Likely pathogenic variants
+pathogenic_variants <- cftr_variants %>%
+  filter(!is.na(CLIN_SIG) & str_detect(tolower(CLIN_SIG), "pathogenic"))
+
+# CF-related phenotypes
+cftr_cf_phenotypes <- cftr_variants %>%
+  filter(!is.na(PHENO) & str_detect(PHENO, regex("Cystic|CFTR|BRONCHIECTASIS", ignore_case=TRUE)))
+
+# Save outputs
+write.csv(cftr_variants, "CFTR_all_variants.csv", row.names=FALSE)
+write.csv(pathogenic_variants, "pathogenic_CFTR_variants.csv", row.names=FALSE)
+write.csv(cftr_cf_phenotypes, "CFTR_CF_related_variants.csv", row.names=FALSE)
+
+# Summary
+cat("Total CFTR variants:", nrow(cftr_variants), "\n")
+cat("CF-related mutations:", sum(cftr_variants$CF_related), "\n")
+cat("Pathogenic/Likely pathogenic:", nrow(pathogenic_variants), "\n")
+cat("Variants with CF-related phenotypes:", nrow(cftr_cf_phenotypes), "\n")
 
 Results
+- Category	Count
+- Total CFTR variants	96
+- CF-related mutations (common)	0
+- Pathogenic/Likely pathogenic	37
+- Variants with CF-related phenotypes	0
 
-CFTR locus variant analysis (child vs father):
-To be added later.
-
-VCF excerpts / IGV screenshots / annotation summaries:
-To be added later.
-
-Inheritance patterns:
-To be added later.
+Note: No variants in this dataset were explicitly annotated with cystic fibrosis or CFTR-related phenotypes.
 
 Clinical Interpretation
 
-Based on the analysis of the CFTR gene and variant annotations:
+Several CFTR variants are pathogenic/likely pathogenic, but none have phenotype annotations linking them to CF in this VEP dataset.
 
-1. Likely pathogenic variants: To be added later.
+The child may carry potentially disease-relevant variants, but no definitive CF-causing mutation is confirmed based on the available annotations.
 
-2. Genotype interpretation (affected, carrier, or unaffected): To be added later.
-
-3. Inheritance pattern (inherited or de novo): To be added later.
+Further targeted testing or functional validation is recommended to confirm CF diagnosis.
 
 Conclusion
 
-To be added later.
+WGS identified CFTR variants in the child and father.
+
+No variants had explicit CF-related phenotype annotations.
+
+Genotype alone is insufficient to confirm cystic fibrosis; additional testing is advised.
