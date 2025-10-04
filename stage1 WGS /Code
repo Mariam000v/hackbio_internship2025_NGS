@@ -165,5 +165,78 @@ gatk GenotypeGVCFs \
 #Check if variants were called
 bcftools view ~/Mariam/project1/vcf/family_cftr.vcf.gz | grep -v "^#" | wc -l
 
+#-------------------------------------------------------------------------------------------------------------------------------
 
+#The VCF file for family genotype was viewed in ENSMBLE VEP
+#Vep2.txt file was downloaded and filtered on RStudio
+# -----------------------------
+# 1. Load libraries
+# -----------------------------
+library(dplyr)
+library(stringr)
 
+# -----------------------------
+# 2. Read VEP output
+# -----------------------------
+vep_file <- "C:/meme plans/Bioinformatics internships/hackbio project2/vep2.txt"
+vep_df <- read.delim(vep_file, header = TRUE, stringsAsFactors = FALSE)
+
+# Quick check
+head(vep_df)
+colnames(vep_df)
+
+# -----------------------------
+# 3. Filter for CFTR gene
+# -----------------------------
+cftr_variants <- vep_df %>% filter(SYMBOL == "CFTR")
+
+# -----------------------------
+# 4. Highlight variants linked to common CF mutations
+# -----------------------------
+cf_mutations <- c("F508del", "G542X", "W1282X", "N1303K", "R117H", "G551D")
+cftr_variants <- cftr_variants %>%
+  mutate(CF_related = ifelse(str_detect(HGVSp, paste(cf_mutations, collapse="|")), TRUE, FALSE))
+
+# -----------------------------
+# 5. Pathogenic/Likely pathogenic variants
+# -----------------------------
+pathogenic_variants <- cftr_variants %>%
+  filter(!is.na(CLIN_SIG) & str_detect(tolower(CLIN_SIG), "pathogenic"))
+
+# -----------------------------
+# 6. CFTR variants with CF-related phenotypes
+# -----------------------------
+cftr_cf_phenotypes <- cftr_variants %>%
+  filter(!is.na(PHENO) & str_detect(PHENO, regex("Cystic|CFTR|BRONCHIECTASIS", ignore_case = TRUE)))
+
+# -----------------------------
+# 7. Summary
+# -----------------------------
+cat("Total CFTR variants:", nrow(cftr_variants), "\n")
+cat("CF-related variants (common CF mutations):", sum(cftr_variants$CF_related), "\n")
+cat("Pathogenic/Likely pathogenic variants:", nrow(pathogenic_variants), "\n")
+cat("Variants linked to CF-related phenotypes:", nrow(cftr_cf_phenotypes), "\n")
+
+# -----------------------------
+# 8. Save outputs
+# -----------------------------
+write.csv(cftr_variants,
+          file = "C:/meme plans/Bioinformatics internships/hackbio project2/CFTR_all_variants.csv",
+          row.names = FALSE)
+
+write.csv(pathogenic_variants,
+          file = "C:/meme plans/Bioinformatics internships/hackbio project2/pathogenic_CFTR_variants.csv",
+          row.names = FALSE)
+
+write.csv(cftr_cf_phenotypes,
+          file = "C:/meme plans/Bioinformatics internships/hackbio project2/CFTR_CF_related_variants.csv",
+          row.names = FALSE)
+
+cat("All CSV files saved successfully.\n")
+
+# -----------------------------
+# 9. Optional: View tables in RStudio
+# -----------------------------
+if(nrow(cftr_variants) > 0) View(cftr_variants)
+if(nrow(pathogenic_variants) > 0) View(pathogenic_variants)
+if(nrow(cftr_cf_phenotypes) > 0) View(cftr_cf_phenotypes)
