@@ -98,9 +98,19 @@ less counts/gene_counts.txt
 
 #7. Differential Expression Analysis
 # Differential expression analysis (DESeq2)
-# To be added later
+R script: hackbio proj2
 
 8. Gene Ontology / Pathway Enrichment
 # Functional enrichment analysis of DE genes
+# Using ShinyGO: https://bioinformatics.sdstate.edu/go/
+# Steps:
+# 1. Upload upregulated_genes_annotated.csv or downregulated_genes_annotated.csv
+# 2. Select organism: Homo sapiens
+# 3. Explore enriched GO terms and pathways
+
+
 # Gene Ontology (GO) and pathway analysis
-# To be added later
+
+
+
+
