@@ -1,0 +1,26 @@
+Stage 0 - Linux & BASh Fundamentals
+
+HackBio Internship 2025
+
+Completed command-line exercises and bioinformatics software setup to build foundational Linux and NGS skills.
+
+Project 1 – Bash Basics
+
+- File & directory management (mkdir, mv, rm, ls)
+- Downloading and organizing files (wget)
+- Text parsing & pattern search (grep, wc)
+- Inspecting .fna and .gbk files (sequence, gene names, source organism)
+- Terminal management (clear, history)
+
+Project 2 – Bioinformatics Software Setup
+
+- Conda environment creation & activation
+- Installed core NGS tools via bioconda: bwa, blast, samtools, bedtools, spades.py, bcftools, fastp, multiqc
+- Verified installations (figlet <name>)
+
+Skills Gained
+
+- Linux command-line proficiency
+- File handling and sequence parsing
+- Conda environment & package management
+- NGS workflow preparation
