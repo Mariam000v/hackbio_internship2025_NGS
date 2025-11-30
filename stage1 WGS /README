@@ -1,0 +1,28 @@
+ Whole-Genome Sequencing (WGS) – HackBio NGS Internship 2025
+
+Clinical case: A 6-year-old boy with suspected Cystic Fibrosis (CF). WGS was performed on the child and father to identify pathogenic CFTR variants and assess inheritance.
+
+Project Goals
+
+- Perform QC and preprocessing of raw WGS reads
+- Align reads to the human reference genome (GRCh38)
+- Call and filter variants, focusing on the CFTR locus
+- Annotate variants using ClinVar/dbSNP
+- Interpret pathogenicity and inheritance patterns
+
+Workflow Overview
+
+- QC & Preprocessing: fastqc, multiqc, optional trimming (fastp)
+- Alignment: BWA-MEM, sorting & indexing with samtools
+- Variant Calling: GATK HaplotypeCaller
+- Filtering: Focused on CFTR gene region
+- Annotation & Interpretation: ClinVar, VEP/ANNOVAR, pathogenicity assessment
+
+Skills Gained
+
+- NGS data handling and quality control
+- Genome alignment and BAM file processing
+- Variant calling and filtering in clinical genomics
+- Gene-focused variant annotation and interpretation
+- Understanding of Mendelian inheritance and CFTR genetics
+- Practical experience with GATK, samtools, bcftools, and variant databases
