@@ -1,1 +1,33 @@
+RNA-seq Analysis of Bipolar II Disorder (HackBio NGS Internship 2025)
 
+This project was completed as part of the HackBio NGS Internship 2025, focusing on RNA-seq transcriptomic profiling of iPSC-derived microglia from Bipolar II Disorder (BD-II) patients and healthy controls. The goal was to explore molecular differences between familial and sporadic BD-II using standard NGS and bioinformatics techniques.
+
+#Skills Gained
+ RNA-seq & NGS Processing
+- FASTQ handling, adapter trimming, quality filtering
+- Running FastQC, MultiQC, and interpreting quality reports
+- Reference genome indexing & read alignment (STAR)
+- Generating gene count matrices (featureCounts)
+
+Bioinformatics & Computational Analysis
+- Differential expression analysis (DESeq2)
+- GO / KEGG functional enrichment
+- Comparing shared vs unique gene signatures between conditions
+
+Data Interpretation & Visualization
+- Creating volcano plots, heatmaps, PCA plots
+- Summarizing DEGs and pathway results
+-Identifying immune, synaptic, and neurodevelopmental patterns
+
+General Workflow Skills
+- Working with SRA datasets
+- Managing NGS pipelines in Linux
+- Producing clear, reproducible analysis steps
+
+#Dataset
+
+Public RNA-seq dataset (SRA accessions SRR33243164–SRR33243171) consisting of BD-II and control microglia samples.
+
+#Project Summary
+
+Performed full RNA-seq workflow to identify transcriptional differences in familial vs sporadic BD-II, uncover dysregulated pathways, and evaluate biological relevance to psychiatric genomics.
