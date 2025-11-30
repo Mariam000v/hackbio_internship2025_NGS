@@ -1,0 +1,62 @@
+RNA-seq Workflow (HackBio NGS Internship 2025)
+This workflow summarizes the main steps used for QC, trimming, alignment, quantification, and downstream analysis of RNA-seq data in the Bipolar II microglia transcriptomics project.
+
+1. Project Setup
+mkdir project2
+cd project2
+mkdir raw_data qc_results multiqc trim alignment_star alignment_logs counts ref scripts
+
+2. Data Download
+
+Download FASTQ files from SRA.
+Script stored as:
+
+scripts/download_data.sh
+
+3. Quality Control
+fastqc raw_data/* -o qc_results/
+multiqc qc_results/ -o multiqc/
+
+4. Trimming
+
+Run trimming script:
+
+bash scripts/trimming.sh
+
+
+Outputs:
+
+trim/trimmed/
+
+trim/fastp_reports/
+
+5. Mapping with STAR
+
+Build genome index:
+
+mkdir -p ref/star_index
+
+STAR \
+  --runThreadN 8 \
+  --runMode genomeGenerate \
+  --genomeDir ref/star_index \
+  --genomeFastaFiles ref/Homo_sapiens_assembly38.fasta
+
+
+Align reads:
+
+bash scripts/mapping.sh
+
+6. Gene Counting
+featureCounts -T 8 -p \
+  -a counts/gencode.v38.annotation.gtf \
+  -o counts/gene_counts.txt \
+  alignment_star/*.bam
+
+7. Differential Expression (R / DESeq2)
+
+Performed using DESeq2 to identify differentially expressed genes.
+
+8. Functional Enrichment
+
+Performed using ShinyGO to identify enriched pathways and biological processes.
