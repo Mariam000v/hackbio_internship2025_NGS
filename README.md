@@ -1,4 +1,4 @@
-🧬 HackBio NGS Internship 2025 – Summary
+#HackBio NGS Internship 2025 – Summary
 
 Completed hands-on training in NGS data analysis across three stages, culminating in a research-focused final project.
 
