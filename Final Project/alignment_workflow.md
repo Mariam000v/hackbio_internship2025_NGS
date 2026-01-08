@@ -5,7 +5,7 @@ This document describes the RNA-seq alignment workflow used to map trimmed paire
 
 ---
 
-## 1. Reference preparation
+##1. Reference preparation
 
 ```bash
 # Move to the reference data folder
